@@ -7,7 +7,15 @@ echo
 nmcli device wifi list
 echo
 
-read -rp "SSID: " SSID
+while true; do
+  read -rp "SSID: " SSID
+
+  if nmcli -t -f IN-USE,SSID device wifi list | cut -d: -f2- | grep -Fxq "$SSID"; then
+    break
+  else
+    echo "SSID not found. Please try again."
+  fi
+done
 
 # Check if connection already exists
 if nmcli -t -f NAME connection show | grep -Fxq "$SSID"; then
