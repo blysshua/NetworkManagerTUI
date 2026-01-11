@@ -1,3 +1,5 @@
+
+
 # NetworkManagerTUI
 A TUI for network manager
 
@@ -23,3 +25,5 @@ Things to add:
 
 
 [] An option to simply disconnect from a network
+
+[] refresh wifi list every few seconds
