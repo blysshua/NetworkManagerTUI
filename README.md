@@ -26,4 +26,6 @@ Things to add:
 
 [] An option to simply disconnect from a network
 
+[] An option to scan again
+
 [] refresh wifi list every few seconds
