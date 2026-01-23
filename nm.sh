@@ -2,13 +2,22 @@
 
 set -e
 
+line() { printf '%*s\n' "$(tput cols)" '' | tr ' ' '='; }
+
+line
 nmcli device status
-echo
+line
 nmcli device wifi list
-echo
+line
 
 while true; do
   read -rp "SSID: " SSID
+
+  # Check for blank input
+  if [[ -z "$SSID" ]]; then
+      echo "SSID cannot be blank. Please try again."
+      continue
+  fi
 
   if nmcli -t -f IN-USE,SSID device wifi list | cut -d: -f2- | grep -Fxq "$SSID"; then
     break
@@ -22,9 +31,20 @@ if nmcli -t -f NAME connection show | grep -Fxq "$SSID"; then
   echo "Using existing connection: $SSID"
   nmcli connection up "$SSID"
 else
-  read -rsp "Password: " PASSWORD
-  echo
-  nmcli device wifi connect "$SSID" password "$PASSWORD"
+  # Limit password attempts to 3
+  for attempt in {1..3}; do
+      read -rsp "Password: " PASSWORD
+      echo
+      if nmcli device wifi connect "$SSID" password "$PASSWORD"; then
+          break
+      else
+          echo "Incorrect password. Attempt $attempt of 3."
+          if [[ $attempt -eq 3 ]]; then
+              echo "Failed to connect after 3 attempts. Exiting."
+              exit 1
+          fi
+      fi
+  done
 fi
 
 nmcli device status
